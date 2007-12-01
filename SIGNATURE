@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 538349eae031c184568ca258e18127f57c0b374f Build.PL
+SHA1 a668e76825b86f47602e6d9ad5a17abea0b611b2 Changes
+SHA1 ed3ea1ad6baf2ab7206120eb49858cb3b8f917e2 MANIFEST
+SHA1 84e12d456a9cabf0d821eb6d6fa8a56ee8e9c7a9 META.yml
+SHA1 cd14ada78fb37a0d926edd86eddcdf7f939de582 Makefile.PL
+SHA1 3dfa7c3f228d36e69223d125fd2be8a417d944ec README
+SHA1 674ebffd1705b6dc885db88a41fdb25008d2faee bin/logparser
+SHA1 b48d054f9116f84960a21e7f2cae16fba15916c3 etc/log4perl.conf
+SHA1 25c49a03bfd7d4cfbe734eaffad37cb0aa9ecaff etc/logparser.conf
+SHA1 b1726e812752f060ef11282af2bda83d14424a02 lib/SNMP/LogParser.pm
+SHA1 eeb4be80e8a4fff01e47b8228d1f751558d14f46 lib/SNMP/LogParserDriver.pm
+SHA1 f40157747b38bdc3bac30edf5346da4ea3a85443 lib/SNMP/LogParserDriver/ExampleDriver.pm
+SHA1 777a20e3139c187628ba8f79c4f358e77cd1e112 lib/SNMP/LogParserDriver/ProxyLog.pm
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 log/logparser.log
+SHA1 5c9c06f0bb3ba026b5930e677ec20682bf8dcf1d t/00-load.t
+SHA1 62b9fe8e6e7bec4918965fdafa992e2b2626d23f t/boilerplate.t
+SHA1 d7a7a501f43d306f5db9e0d4206aa0451a646c02 t/concurrentProcess.t
+SHA1 39c63fc90b4871441d2dce3c9e49474a57180f46 t/logparser.t
+SHA1 6da39b48ce64b584e4c3274bff96fc76ff484820 t/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 work/logparser.properties
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iD8DBQFHUYy7cV+oKB/QqikRAuyQAJ9ttVAfvguw+fqLuwSK20lKyzgljACeMyKX
+ItAyhziHUTr9e4H27usZH1g=
+=0fgg
+-----END PGP SIGNATURE-----
