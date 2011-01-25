@@ -19,4 +19,3 @@ t/pod-coverage.t
 t/pod.t
 log/logparser.log
 work/logparser.properties
-SIGNATURE    Added here by Module::Build

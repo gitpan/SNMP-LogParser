@@ -1,5 +1,5 @@
 #
-# $Id: ProxyLog.pm 765 2007-12-01 16:35:52Z nito $
+# $Id: ProxyLog.pm 1627 2008-05-12 09:40:59Z nito $
 #
 # A bit more complicated class
 #
@@ -365,4 +365,13 @@ LogparserDriver
 
 =head1 AUTHOR
 
-Nito@Qindel.es -- 7/9/2006
+Nito at Qindel dot ES -- 7/9/2006
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2007 by Qindel Formacion y Servicios SL, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

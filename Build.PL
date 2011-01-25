@@ -34,9 +34,9 @@ my $build = Module::Build->new
 	 'POSIX' => 0,
 	 'File::Temp' => 0,
      },
-
+     
      );
-$build->create_makefile_pl;
+$build->create_makefile_pl('traditional');
 $build->add_build_element('etc');
 $build->add_build_element('log');
 $build->add_build_element('work');

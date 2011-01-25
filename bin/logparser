@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# $Id: logparser 762 2007-12-01 16:29:04Z nito $
+# $Id: logparser 10052 2011-01-25 13:20:43Z nito $
 #
 # Generic parser script used to
 # fetch data from logs to cricket
@@ -43,7 +43,7 @@ sub pidIsRunning($);
 
 # Constants
 use constant AUTHOR => 'Nito@Qindel.ES';
-use constant VERSION => '$Id: logparser 762 2007-12-01 16:29:04Z nito $ ';
+use constant VERSION => '$Id: logparser 10052 2011-01-25 13:20:43Z nito $ ';
 use constant LOG_TAG => 'logparser';
 use constant NUM_PROCESSES => 1;
 use constant STOREFILE => '/var/lib/logparser/logparser.store';
@@ -265,7 +265,8 @@ sub parseLog($$$) {
   my $logdriver = $$log_ref{'driver'};
   my $seekPosition = defined($$globalsavespace_ref{'seekPosition'}{"$name"}) ?
     $$globalsavespace_ref{'seekPosition'}{"$name"} : 0;
-  eval "require $logdriver";
+  eval "require $logdriver" or 
+      do { $logger->warn("Cannot load driver $logdriver: $@"); return };
   $logger->info("[$name] Creating driver $logdriver");
   my $driver = $logdriver->new();
 
@@ -802,6 +803,15 @@ be parsed.
 
 =head1 AUTHOR
 
-Nito Martinez <Nito@Qindel.ES>
+Nito Martinez <Nito at Qindel dot ES>
 
 5/5/2005
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2007 by Qindel Formacion y Servicios SL, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

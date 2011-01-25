@@ -1,6 +1,9 @@
-$Id: Changes 767 2007-12-01 16:40:13Z nito $
+$Id: Changes 10053 2011-01-25 13:23:22Z nito $
 
 Revision history for SNMP-LogParser
+
+1.10052  25/1/2011
+	 Updated eval condition on non existent logdrivers
 
 1.0767  1/12/2007
         Changed name from NetSNMP-LogParser to SNMP-LogParser. Suggestion from brian d foy <brian.d.foy@gmail.com>  (Perl Authors Upload Server)
