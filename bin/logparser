@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 #
-# $Id: logparser 10052 2011-01-25 13:20:43Z nito $
+# $Id: logparser 10171 2011-02-10 14:00:11Z rporres $
 #
-# Generic parser script used to
-# fetch data from logs to cricket
+# Generic parser script used to fetch data
+# from logs and generate a properties file
 #
 # Nito@Qindel.ES -- 4/5/2005
 
@@ -19,7 +19,7 @@ use Config::Properties::Simple;
 use Storable qw(lock_store lock_retrieve);
 use Statistics::Descriptive;
 use Log::Log4perl;
-use Fcntl ':flock'; # import LOCK_* constants
+use Fcntl qw(:flock SEEK_SET); # import LOCK_* and SEEK_SET constants
 use File::Spec;
 use File::Temp;
 use Proc::ProcessTable;
@@ -43,7 +43,7 @@ sub pidIsRunning($);
 
 # Constants
 use constant AUTHOR => 'Nito@Qindel.ES';
-use constant VERSION => '$Id: logparser 10052 2011-01-25 13:20:43Z nito $ ';
+use constant VERSION => '$Id: logparser 10171 2011-02-10 14:00:11Z rporres $ ';
 use constant LOG_TAG => 'logparser';
 use constant NUM_PROCESSES => 1;
 use constant STOREFILE => '/var/lib/logparser/logparser.store';
@@ -132,8 +132,8 @@ sub cleanupAndExit($) {
 sub get_command_line_options($) {
   my ($globalsavespace_ref) = @_;
 
-  our ($opt_f, $opt_p, $opt_s, $opt_h, $opt_v, $opt_l, $opt_o, $opt_k);
-  getopts('f:p:s:l:hv') or pod2usage(2);
+  our ($opt_f, $opt_p, $opt_s, $opt_h, $opt_v, $opt_l, $opt_o, $opt_k, $opt_I);
+  getopts('f:p:s:hvl:o:k:I:') or pod2usage(2);
 
   if ($opt_v) {
     print $0." version ".VERSION." ".AUTHOR."\n";
@@ -144,6 +144,12 @@ sub get_command_line_options($) {
     pod2usage({'-verbose'=>2, -exitval=>0});
     exit 0;
   }
+
+  if ($opt_I) {
+    my @libs = split /,/, $opt_I;
+    unshift @INC, @libs;
+  }
+
   my $config_file = defined($opt_f) ? $opt_f : LOGPARSERCONF;
   my $cfg = Config::Properties::Simple->new(file => $config_file);
   my $procNumber = defined($opt_p) ? $opt_p : $cfg->requireProperty('processes', NUM_PROCESSES);
@@ -327,7 +333,7 @@ sub seekFile($$$) {
   if ($fileLength < $$seekPosition_ref) {
     $$seekPosition_ref = 0;
   }
-  my $seekResult = seek ($file, $$seekPosition_ref, &Fcntl::SEEK_SET) or
+  my $seekResult = seek ($file, $$seekPosition_ref, SEEK_SET) or
     cleanupAndExit("Cannot seek position $$seekPosition_ref for file ".$fileName.":$!");
 
   $logger->info("Seek position is now $$seekPosition_ref for file ".$fileName);
@@ -409,8 +415,9 @@ B<logparser.pl>
 
 =head1 SYNOPSIS
 
-B<logparser.pl> [-f configFile] [-p processes] [-s storeFile] [-o propertiesFile] 
-                [-l log4perlFile]
+B<logparser.pl> [-f configFile] [-p processes] [-s storeFile]
+                [-o propertiesFile] [-l log4perlFile] [-k lockFile]
+                [-I path/to/lib1,path/to/lib2,...]
 
 Parses a log file
 
@@ -809,7 +816,7 @@ Nito Martinez <Nito at Qindel dot ES>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2007 by Qindel Formacion y Servicios SL, all rights reserved.
+Copyright 2007-2011 by Qindel Formacion y Servicios SL, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

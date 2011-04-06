@@ -2,29 +2,29 @@
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-          'NAME' => 'SNMP::LogParser',
-          'VERSION_FROM' => 'lib/SNMP/LogParser.pm',
-          'PREREQ_PM' => {
-                           'Config::Properties::Simple' => '0.14',
-                           'File::Path' => '1.05',
-                           'File::Spec' => 0,
-                           'File::Temp' => 0,
-                           'File::stat' => 0,
-                           'Log::Dispatch::FileRotate' => 0,
-                           'Log::Log4perl' => 0,
-                           'POSIX' => 0,
-                           'Pod::Usage' => 0,
-                           'Proc::ProcessTable' => 0,
-                           'Statistics::Descriptive' => 0,
-                           'Storable' => 0,
-                           'Test::More' => 0,
-                           'Test::Pod' => '1.14',
-                           'Test::Pod::Coverage' => '1.04'
-                         },
-          'INSTALLDIRS' => 'site',
-          'EXE_FILES' => [
-                           'bin/logparser'
-                         ],
-          'PL_FILES' => {}
-        )
+  'NAME' => 'SNMP::LogParser',
+  'VERSION_FROM' => 'lib/SNMP/LogParser.pm',
+  'PREREQ_PM' => {
+                   'Config::Properties::Simple' => '0.14',
+                   'File::Path' => '1.05',
+                   'File::Spec' => 0,
+                   'File::Temp' => 0,
+                   'File::stat' => 0,
+                   'Log::Dispatch::FileRotate' => 0,
+                   'Log::Log4perl' => 0,
+                   'POSIX' => 0,
+                   'Pod::Usage' => 0,
+                   'Proc::ProcessTable' => 0,
+                   'Statistics::Descriptive' => 0,
+                   'Storable' => 0,
+                   'Test::More' => 0,
+                   'Test::Pod' => '1.14',
+                   'Test::Pod::Coverage' => '1.04'
+                 },
+  'INSTALLDIRS' => 'site',
+  'EXE_FILES' => [
+                   'bin/logparser'
+                 ],
+  'PL_FILES' => {}
+)
 ;

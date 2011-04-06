@@ -3,7 +3,7 @@ package SNMP::LogParser;
 use warnings;
 use strict;
 # Checked version
-$SNMP::LogParser::VERSION = sprintf "1.%04d", q$Revision: 10052 $ =~ /(\d+)/g;
+$SNMP::LogParser::VERSION = sprintf "1.%04d", q$Revision: 10178 $ =~ /(\d+)/g;
 
 =head1 NAME
 
@@ -11,7 +11,7 @@ SNMP::LogParser - An incremental logparser to be used with Net-SNMP
 
 =head1 VERSION
 
-Version $Revision: 10052 $
+Version $Revision: 10178 $
 
 =head1 SYNOPSIS
 
@@ -19,8 +19,10 @@ This is just a wrapper module, please look at
 B<SNMP::LogParser::LogParserDriver> and
 at B<logparser>
 
-B<logparser.pl> [-f configFile] [-p processes] [-s storeFile] [-o propertiesFile] 
-                [-l log4perlFile]
+B<logparser.pl> [-f configFile] [-p processes] [-s storeFile]
+                [-o propertiesFile] [-l log4perlFile] [-k lockFile]
+                [-I path/to/lib1,path/to/lib2,...]
+
 
 Parses a log file
 

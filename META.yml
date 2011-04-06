@@ -13,7 +13,7 @@ name: SNMP-LogParser
 provides:
   SNMP::LogParser:
     file: lib/SNMP/LogParser.pm
-    version: 1.10052
+    version: 1.10178
   SNMP::LogParserDriver:
     file: lib/SNMP/LogParserDriver.pm
   SNMP::LogParserDriver::ExampleDriver:
@@ -38,4 +38,4 @@ requires:
   Test::Pod::Coverage: 1.04
 resources:
   license: http://dev.perl.org/licenses/
-version: 1.10052
+version: 1.10178

@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 791a9268801d8752abe9d79fc3a8178a515c524e Build.PL
+SHA1 8d20adc66c8cff1664b873d1d46135e3a024b6f0 Changes
+SHA1 ed3ea1ad6baf2ab7206120eb49858cb3b8f917e2 MANIFEST
+SHA1 88002f55b3d7a01c67fa59538e36e5356e75f9b6 META.yml
+SHA1 63283defb470230a226c4c00d06fedf791f7d18d Makefile.PL
+SHA1 3dfa7c3f228d36e69223d125fd2be8a417d944ec README
+SHA1 e254b23dbd60cfe295397a8871a659934740ba49 bin/logparser
+SHA1 b48d054f9116f84960a21e7f2cae16fba15916c3 etc/log4perl.conf
+SHA1 25c49a03bfd7d4cfbe734eaffad37cb0aa9ecaff etc/logparser.conf
+SHA1 07a66ba34c387645514af7cfa22fba1cde3888ab lib/SNMP/LogParser.pm
+SHA1 f835cabcc25d08093d55846a09c5bdd37da851c2 lib/SNMP/LogParserDriver.pm
+SHA1 c9424b868ef5d780c2e0e66693b3f3724e7c67b3 lib/SNMP/LogParserDriver/ExampleDriver.pm
+SHA1 e650c102a62c72323e791f70d6c7be403d0c4bec lib/SNMP/LogParserDriver/ProxyLog.pm
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 log/logparser.log
+SHA1 5c9c06f0bb3ba026b5930e677ec20682bf8dcf1d t/00-load.t
+SHA1 62b9fe8e6e7bec4918965fdafa992e2b2626d23f t/boilerplate.t
+SHA1 d7a7a501f43d306f5db9e0d4206aa0451a646c02 t/concurrentProcess.t
+SHA1 39c63fc90b4871441d2dce3c9e49474a57180f46 t/logparser.t
+SHA1 6da39b48ce64b584e4c3274bff96fc76ff484820 t/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 work/logparser.properties
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (Darwin)
+
+iQEcBAEBAgAGBQJNVSnzAAoJENeUJt15+guAqpcIAIKSOttX8tR/IHqqTdtW+tsG
+UNKSY6xhyEuVT2XNIy34sNlM/OkJ10oDoAaVqvbtyOSUB3ez/r/BkkHC4/+0gxyw
+/8OJxmLmAL/44DdjJZHWZ7B367cI4hozs90epl8toVXBd+LZ37xZjr92cbwmS+n/
+ZGnTu+/VIcn++luVev7+6EAHmaqVCgWVkpFftNS+HV9QzbX6wk+Mqm0gt+o2bQwI
+w4rySZ8DZLKnvQSl0luXnqJuyKTlgplDjXFSAuAEw4cGps15jq2A7uLHYHiOQvyQ
+8HDlSqoZXkSsyUmTx2shwY2kKzjQkl7yY9S8Y61qssipUcdXAnRIOBQgtfgirNU=
+=gDJA
+-----END PGP SIGNATURE-----
