@@ -1,19 +1,13 @@
 #
-# $Id: ProxyLog.pm 1627 2008-05-12 09:40:59Z nito $
+# $Id: ProxyLog.pm 14990 2012-04-10 12:57:24Z rporres $
 #
 # A bit more complicated class
 #
 # Nito@Qindel.ES -- 7/9/2006
-package SNMP::LogparserDriver::ProxyLog;
-
+package SNMP::LogParserDriver::ProxyLog;
+use strict;
 use warnings;
-#use strict;
-use Log::Log4perl;
-use Data::Dumper;
-use SNMP::LogParserDriver;
-
-@SNMP::LogParserDriver::ProxyLog::ISA = ('SNMP::LogparserDriver');
-#@ISA = ('LogparserDriver');
+use parent 'SNMP::LogParserDriver';
 
 our %nsCacheIPClient;
 our %nsCacheUserClient;

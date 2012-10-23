@@ -13,19 +13,18 @@ name: SNMP-LogParser
 provides:
   SNMP::LogParser:
     file: lib/SNMP/LogParser.pm
-    version: 1.10178
+    version: 1.15290
   SNMP::LogParserDriver:
     file: lib/SNMP/LogParserDriver.pm
   SNMP::LogParserDriver::ExampleDriver:
     file: lib/SNMP/LogParserDriver/ExampleDriver.pm
-  SNMP::LogparserDriver::ProxyLog:
-    file: lib/SNMP/LogParserDriver/ProxyLog.pm
 requires:
   Config::Properties::Simple: 0.14
   File::Path: 1.05
   File::Spec: 0
   File::Temp: 0
   File::stat: 0
+  IPC::Run3: 0
   Log::Dispatch::FileRotate: 0
   Log::Log4perl: 0
   POSIX: 0
@@ -36,6 +35,9 @@ requires:
   Test::More: 0
   Test::Pod: 1.14
   Test::Pod::Coverage: 1.04
+  Test::SharedFork: 0
+  lib: 0
+  parent: 0
 resources:
   license: http://dev.perl.org/licenses/
-version: 1.10178
+version: 1.15290

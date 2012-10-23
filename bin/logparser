@@ -1,11 +1,13 @@
 #!/usr/bin/perl
 #
-# $Id: logparser 10171 2011-02-10 14:00:11Z rporres $
+# $Id: logparser 15290 2012-05-03 21:00:07Z rporres $
 #
 # Generic parser script used to fetch data
 # from logs and generate a properties file
 #
 # Nito@Qindel.ES -- 4/5/2005
+
+use 5.006;
 
 use strict;
 use warnings;
@@ -13,7 +15,7 @@ use warnings;
 use Data::Dumper;
 use Pod::Usage;
 use POSIX;
-use Getopt::Std;
+use Getopt::Long;
 use File::stat;
 use Config::Properties::Simple;
 use Storable qw(lock_store lock_retrieve);
@@ -28,30 +30,19 @@ use Proc::ProcessTable;
 # global vars
 local our $logger;
 
-# prototypes
-sub get_command_line_options($);
-sub updateStats($$);
-sub getVariables($$);
-sub storeVariables($$);
-sub storeProperties($$);
-sub parseLog($$$);
-sub seekFile($$$);
-sub createAndCheckLock($);
-sub deleteLock($$);
-sub cleanupAndExit($);
-sub pidIsRunning($);
-
 # Constants
-use constant AUTHOR => 'Nito@Qindel.ES';
-use constant VERSION => '$Id: logparser 10171 2011-02-10 14:00:11Z rporres $ ';
-use constant LOG_TAG => 'logparser';
-use constant NUM_PROCESSES => 1;
-use constant STOREFILE => '/var/lib/logparser/logparser.store';
-use constant PROPERTIESFILE => '/var/lib/logparser/logparser.properties';
-use constant LOCKFILE => '/tmp/.logparser.lockfile';
-use constant LOGPARSERCONF => '/etc/logparser/logparser.conf';
-use constant LOG4PERLCONF => '/etc/logparser/log4perl.conf';
-
+use constant {
+    AUTHOR          => 'Nito@Qindel.ES',
+    VERSION         => '$Id: logparser 15290 2012-05-03 21:00:07Z rporres $ ',
+    LOG_TAG         => 'logparser',
+    NUM_PROCESSES   => 1,
+    STOREFILE       => '/var/lib/logparser/logparser.store',
+    PROPERTIESFILE  => '/var/lib/logparser/logparser.properties',
+    LOCKFILE        => '/tmp/.logparser.lockfile',
+    LOGPARSERCONF   => '/etc/logparser/logparser.conf',
+    LOG4PERLCONF    => '/etc/logparser/log4perl.conf',
+    WAIT_AFTER_LOCK => 0,
+};
 
 # Before Main :-)
 # Adds the directory ../lib relative to $0 to the INC dir
@@ -59,7 +50,7 @@ BEGIN {
   my ($volume,$directories,$file) = File::Spec->splitpath($0);
   my $lib_path = 
     File::Spec->rel2abs(File::Spec->catfile($directories, '../lib'));
-  push @INC, $lib_path;
+  unshift @INC, $lib_path;
 }
 
 # main
@@ -71,8 +62,8 @@ my %properties;
 # Global variables only used in cleanupAndExit
 our ($lockFile, $lockHandle);
 
-my ($cfg, $procNumber, $storeFile, $propertiesFile, $log4perlFile, $log_ref);
-($cfg, $procNumber, $storeFile, $propertiesFile, $lockFile, $log4perlFile, $log_ref) = get_command_line_options(\%globalsavespace);
+my ($cfg, $procNumber, $storeFile, $propertiesFile, $log4perlFile, $waitAfterLock, $log_ref);
+($cfg, $procNumber, $storeFile, $propertiesFile, $lockFile, $log4perlFile, $waitAfterLock, $log_ref) = get_command_line_options(\%globalsavespace);
 $| = 1;
 
 Log::Log4perl->init($log4perlFile);
@@ -84,8 +75,10 @@ getVariables($storeFile, \%globalsavespace);
 
 $lockHandle = createAndCheckLock($lockFile);
 
-my ($log);
-foreach $log (keys %$log_ref) {
+# This only makes sense to test concurrent locking process
+$waitAfterLock > 0 and sleep $waitAfterLock;
+
+foreach my $log (keys %$log_ref) {
   parseLog($$log_ref{$log}, \%globalsavespace, \%properties);
 }
 
@@ -109,7 +102,7 @@ deleteLock($lockHandle, $lockFile);
 # Implicitly it also uses the global variables lockHandle and lockFile
 # Output:
 # None, the progam exits
-sub cleanupAndExit($) {
+sub cleanupAndExit {
   my $message = shift;
   deleteLock($lockHandle, $lockFile);
   $logger->error_die($message);
@@ -129,11 +122,23 @@ sub cleanupAndExit($) {
 # - The lock file
 # - The log4perl configuration file
 # - A reference to the log hash
-sub get_command_line_options($) {
+sub get_command_line_options {
   my ($globalsavespace_ref) = @_;
 
-  our ($opt_f, $opt_p, $opt_s, $opt_h, $opt_v, $opt_l, $opt_o, $opt_k, $opt_I);
-  getopts('f:p:s:hvl:o:k:I:') or pod2usage(2);
+  my ($opt_f, $opt_p, $opt_s, $opt_h, $opt_v, $opt_l, $opt_o, $opt_k, $opt_I, $opt_w);
+
+  GetOptions(
+    'file|f=s'            => \$opt_f,
+    'process-number|p=i'  => \$opt_p,
+    'store-file|s=s'      => \$opt_s,
+    'properties-file|o=s' => \$opt_o,
+    'help|h'              => \$opt_h,
+    'version|v'           => \$opt_v,
+    'log4perl-file|l=s'   => \$opt_l,
+    'lock-file|k=s'       => \$opt_k,
+    'include|I=s@'        => \$opt_I,
+    'wait-after-lock|w=i' => \$opt_w,
+  ) or pod2usage(2);
 
   if ($opt_v) {
     print $0." version ".VERSION." ".AUTHOR."\n";
@@ -145,21 +150,26 @@ sub get_command_line_options($) {
     exit 0;
   }
 
+  # a previous version supported the syntax logparser -I path1,path2
   if ($opt_I) {
-    my @libs = split /,/, $opt_I;
+    my @libs;
+    for my $dirs (@$opt_I) {
+      push @libs, map { -d $_ and File::Spec->canonpath($_) } split /,/, $dirs;
+    }
     unshift @INC, @libs;
   }
 
-  my $config_file = defined($opt_f) ? $opt_f : LOGPARSERCONF;
-  my $cfg = Config::Properties::Simple->new(file => $config_file);
-  my $procNumber = defined($opt_p) ? $opt_p : $cfg->requireProperty('processes', NUM_PROCESSES);
-  my $storeFile = defined($opt_s) ? $opt_s : $cfg->requireProperty('storeFile', STOREFILE);
+  my $config_file    = defined($opt_f) ? $opt_f : LOGPARSERCONF;
+  my $cfg            = Config::Properties::Simple->new(file => $config_file);
+  my $procNumber     = defined($opt_p) ? $opt_p : $cfg->requireProperty('processes', NUM_PROCESSES);
+  my $storeFile      = defined($opt_s) ? $opt_s : $cfg->requireProperty('storeFile', STOREFILE);
   my $propertiesFile = defined($opt_o) ? $opt_o : $cfg->requireProperty('propertiesFile', PROPERTIESFILE);
-  my $lockFile = defined($opt_k) ? $opt_k : $cfg->requireProperty('lockFile', LOCKFILE);
-  my $log4perlFile = defined($opt_l) ? $opt_l : $cfg->requireProperty('log4perlFile', LOG4PERLCONF);
-  my $log_ref = getLogInformation($cfg);
+  my $lockFile       = defined($opt_k) ? $opt_k : $cfg->requireProperty('lockFile', LOCKFILE);
+  my $log4perlFile   = defined($opt_l) ? $opt_l : $cfg->requireProperty('log4perlFile', LOG4PERLCONF);
+  my $waitAfterLock  = defined($opt_w) ? $opt_w : $cfg->requireProperty('waitAfterLock', WAIT_AFTER_LOCK);
+  my $log_ref        = getLogInformation($cfg);
 
-  return ($cfg, $procNumber, $storeFile, $propertiesFile, $lockFile, $log4perlFile, $log_ref);
+  return ($cfg, $procNumber, $storeFile, $propertiesFile, $lockFile, $log4perlFile, $waitAfterLock, $log_ref);
 }
 
 # getLogInformation($cfg, $log_ref);
@@ -168,7 +178,7 @@ sub get_command_line_options($) {
 # - The log hash reference
 # Output:
 # Implicitly the globalsavespace hash gets updated with the log information.
-sub getLogInformation($) {
+sub getLogInformation {
   my ($cfg) = @_;
 
   my $log = $cfg->splitToTree();
@@ -185,7 +195,7 @@ sub getLogInformation($) {
   # log.myfile.name=myfile
   foreach my $key (keys %{$$log{log}}) {
       if (!exists($$log{log}{$key}{'name'})) {
-	  $$log{log}{$key}{'name'} = $key;
+        $$log{log}{$key}{'name'} = $key;
       }
   }
 
@@ -197,8 +207,8 @@ sub getLogInformation($) {
 #
 # Uses the storable Method to retrieve the variables from the file
 # If the file does not exists it doesn't update any of the variables
-sub getVariables($$) {
-  my ($storefile, $savespace_ref) =@_;
+sub getVariables {
+  my ($storefile, $savespace_ref) = @_;
 
   return if (! -r $storefile);
 
@@ -215,8 +225,7 @@ sub getVariables($$) {
 #
 # Uses the storable Method to store the variables into the file
 # If the file does not exists it doesn't update any of the variables
-sub storeVariables($$) {
-
+sub storeVariables {
   my ($storefile, $savespace_ref) = @_;
   my $result = lock_store($savespace_ref, $storefile);
   if (!defined($result)) {
@@ -238,14 +247,13 @@ sub storeVariables($$) {
 # Output:
 # None. But as a side effect the properties file is created
 #
-sub storeProperties($$) {
+sub storeProperties {
   my ($file, $properties_ref) = @_;
 
-  my $properties = new Config::Properties();
+  my $properties = Config::Properties->new();
   foreach my $property (keys %$properties_ref) {
     if (defined($$properties_ref{$property})) {
-      $properties->setProperty($property,
-			       $$properties_ref{$property});
+      $properties->setProperty($property, $$properties_ref{$property});
     }
   }
 
@@ -263,19 +271,21 @@ sub storeProperties($$) {
 # parseLog
 # Input:
 # - A reference to the log hash
-sub parseLog($$$) {
+sub parseLog {
   my ($log_ref, $globalsavespace_ref, $properties_ref) = @_;
 
-  my $file = $$log_ref{'file'};
-  my $name = $$log_ref{'name'};
-  my $logdriver = $$log_ref{'driver'};
-  my $seekPosition = defined($$globalsavespace_ref{'seekPosition'}{"$name"}) ?
-    $$globalsavespace_ref{'seekPosition'}{"$name"} : 0;
+  my $file         = $$log_ref{'file'};
+  my $name         = $$log_ref{'name'};
+  my $logdriver    = $$log_ref{'driver'};
+  my $seekPosition = defined($$globalsavespace_ref{'seekPosition'}{"$name"}) 
+                     ? $$globalsavespace_ref{'seekPosition'}{"$name"} : 0;
+
+  ## no critic (BuiltinFunctions::ProhibitStringyEval)
   eval "require $logdriver" or 
       do { $logger->warn("Cannot load driver $logdriver: $@"); return };
   $logger->info("[$name] Creating driver $logdriver");
-  my $driver = $logdriver->new();
 
+  my $driver = $logdriver->new();
   $driver->savespace($$globalsavespace_ref{'savespace'}{$name})
     if (defined($$globalsavespace_ref{'savespace'}{$name}));
 
@@ -283,25 +293,25 @@ sub parseLog($$$) {
 
   # log file parsing
   $logger->info("[$name] Parsing log $file");
-  open LOG, $file
+  open my $log_fh, '<', $file
     or cleanupAndExit("Cannot open file for parsing $file :$!");
-  seekFile(\*LOG, $file, \$seekPosition);
+  seekFile($log_fh, $file, \$seekPosition);
   my $numLinesParsed = 0;
   my $numLinesMatched = 0;
   my $pattern = $driver->pattern;
 
-  while (<LOG>) {
+  while (<$log_fh>) {
     if ($driver->evalIterate($_)) {
        $logger->debug("[$name] Matched <$pattern> for line <$_>");
- 	$numLinesMatched ++;
-      }
+       $numLinesMatched ++;
+    }
     $numLinesParsed ++;
   }
 
-  $$globalsavespace_ref{'seekPosition'}{$name} = tell LOG;
+  $$globalsavespace_ref{'seekPosition'}{$name} = tell $log_fh;
   $logger->info("[$name] The number of lines parsed for log $file were $numLinesParsed with $numLinesMatched lines matched and seek position is now ".$$globalsavespace_ref{'seekPosition'}{$name});
 
-  close LOG
+  close $log_fh
     or cleanupAndExit("[$name] Cannot close file $file: $!");
 
   $driver->evalEnd;
@@ -325,7 +335,7 @@ sub parseLog($$$) {
 # 1) The seek position of the file is changed
 # 2) The variable holding the position can be changed.
 
-sub seekFile($$$) {
+sub seekFile {
   my ($file, $fileName, $seekPosition_ref) = @_;
 
   my $file_ref = stat($fileName);
@@ -350,23 +360,25 @@ sub seekFile($$$) {
 # - The lockFile
 # Output:
 # - The file handle opened
-sub createAndCheckLock($) {
+sub createAndCheckLock {
   my $file = shift;
   my $fh;
   my $success = sysopen($fh, $file, O_WRONLY|O_EXCL|O_CREAT);
   if (!$success) {
     # The file exists we need to check now if the pid is running
-    open FH, $file
+    open my $lock_fh, '<', $file
       or $logger->error_die("can't open lock file $file after checking that it exists???: $!");
-    my $pid = <FH>;
+    my $pid = <$lock_fh>;
     chomp $pid;
+    close $lock_fh;
+
     if (pidIsRunning($pid)) {
-      $logger->error_die("A previus logparser is running, check pid $pid (got the pid from $file): $!");
+      $logger->error_die("A previous logparser is running, check pid $pid (got the pid from $file): $!");
     } else {
       unlink $file
-	or $logger->error_die("can't delete lock file $file after checking that the PID $pid is not running: $!");
+        or $logger->error_die("can't delete lock file $file after checking that the PID $pid is not running: $!");
       sysopen($fh, $file, O_WRONLY|O_EXCL|O_CREAT)
-	or $logger->error_die("can't open lock file $file after checking that it exists???: $!");
+        or $logger->error_die("can't open lock file $file after checking that it exists???: $!");
     }
   }
   $fh->autoflush;
@@ -381,8 +393,7 @@ sub createAndCheckLock($) {
 # - The pid
 # Output:
 # - True if the pid is running and false otherwise
-sub pidIsRunning($)
-{
+sub pidIsRunning {
   my $pid = shift;
   my $table = Proc::ProcessTable->new()->table;
   my %processes = map { $_->pid => $_ } @$table;
@@ -398,7 +409,7 @@ sub pidIsRunning($)
 # - The lockFile
 # Output:
 # - None
-sub deleteLock($$) {
+sub deleteLock {
   my ($fh, $file) = @_;
   close $fh
     or $logger->error("Error closing filehandler for $file:$!");
@@ -417,7 +428,7 @@ B<logparser.pl>
 
 B<logparser.pl> [-f configFile] [-p processes] [-s storeFile]
                 [-o propertiesFile] [-l log4perlFile] [-k lockFile]
-                [-I path/to/lib1,path/to/lib2,...]
+                [-I path/to/lib1 -I path/to/lib2]
 
 Parses a log file
 
@@ -560,13 +571,13 @@ All the command line options override the options in the configuration file.
 
 =over 8
 
-=item B<-f configuration file>
+=item B<-f|--file configuration file>
 
 Indicates the configuration file.
 There is no corresponding configuration file option.
 The default value is "/etc/logparser/logparser.conf".
 
-=item B<-p number of processes>
+=item B<-p|--process-number process number>
 
 Indicates how many concurrent processes should be run in parallel.
 The corresponding configuration file option is "processes".
@@ -575,7 +586,7 @@ The default value is 1.
 
 This option is not implemented yet
 
-=item B<-s storeFile>
+=item B<-s|--store-file storeFile>
 
 Indicates in which file the %properties hash should be stored.
 This has will be stored in a Java properties file in pairs
@@ -583,17 +594,32 @@ of key=value pairs
 
 For more information please see the B<LogparserDriver> page.
 
-=item B<-l log4perlFile>
+=item B<-l|--log4perl-file log4perlFile>
 
 Indicates the configuration file for the Log4Perl configuration file.
 The corresponding configuration file option is "log4perlFile".
 The default value is "/etc/logparser/log4perl.conf"
 
-=item B<-h>
+=item B<-k|lock-file lockFile>
+
+Indicates the lock file.  The corresponding configuration file option
+is "lockFile".  The default value is "/tmp/.logparser.lockfile"
+
+=item B<-o|--properties-file>
+
+Indicates the properties file.  The corresponding configuration file option
+is "propertiesFile".  The default value is "/var/lib/logparser/logparser.properties"
+
+=item B<-I|--include path/to/lib>
+
+Use this to include alternative paths to find Logparser Drivers to avoid setting
+shell variables when running logparser
+
+=item B<-h|--help>
 
 Shows this help page
 
-=item B<-v>
+=item B<-v|--version>
 
 Shows the version of the script.
 
@@ -661,13 +687,12 @@ We create a the file /usr/lib/LogparserDriver/MailLog.pm
 with the following content:
 
 
- package LogparserDriver::ProxyLog;
+ package SNMP::LogparserDriver::ProxyLog;
  
  use warnings;
  use Log::Log4perl;
- use LogparserDriver;
- 
- @LogparserDriver::ProxyLog::ISA = ('LogparserDriver');
+
+ use parent 'SNMP::LogparserDriver';
  
  # Class constructor
  sub new {
@@ -766,6 +791,8 @@ The perl packages installed for this script are:
 
 =item * Log::Dispatch::FileRotate
 
+=item * parent
+
 =back
 
 =head1 BUGS
@@ -804,7 +831,7 @@ be parsed.
 
 =item B<Log::Log4perl> For the logging configuration
 
-=item B<LogparserDriver> For the default driver for parsing logs
+=item B<SNMP::LogparserDriver> For the default driver for parsing logs
 
 =back
 

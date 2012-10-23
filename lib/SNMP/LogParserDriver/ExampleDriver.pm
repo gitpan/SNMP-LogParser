@@ -1,14 +1,13 @@
 #
-# $Id: ProxyLog.pm,v 1.1 2006/09/11 07:35:31 nito Exp $
+# $Id: ExampleDriver.pm 14990 2012-04-10 12:57:24Z rporres $
 #
 # A bit more complicated class
 #
 # Nito@Qindel.ES -- 7/9/2006
 package SNMP::LogParserDriver::ExampleDriver;
-use SNMP::LogParserDriver;
-
-@SNMP::LogParserDriver::ExampleDriver::ISA = ('SNMP::LogParserDriver');
-
+use strict;
+use warnings;
+use parent 'SNMP::LogParserDriver';
 
 =head1 NAME
 

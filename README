@@ -15,6 +15,8 @@ it to the parsing that you need.
 Once you've learned it, you can do quick deployments of SNMP info gathered from
 log files.
 
+You have more examples of LogParser Drivers in the EXAMPLES directory
+
 INSTALLATION
 
 To install this module, run the following commands:

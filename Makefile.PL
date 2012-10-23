@@ -10,6 +10,7 @@ WriteMakefile
                    'File::Spec' => 0,
                    'File::Temp' => 0,
                    'File::stat' => 0,
+                   'IPC::Run3' => 0,
                    'Log::Dispatch::FileRotate' => 0,
                    'Log::Log4perl' => 0,
                    'POSIX' => 0,
@@ -19,7 +20,10 @@ WriteMakefile
                    'Storable' => 0,
                    'Test::More' => 0,
                    'Test::Pod' => '1.14',
-                   'Test::Pod::Coverage' => '1.04'
+                   'Test::Pod::Coverage' => '1.04',
+                   'Test::SharedFork' => 0,
+                   'lib' => 0,
+                   'parent' => 0
                  },
   'INSTALLDIRS' => 'site',
   'EXE_FILES' => [

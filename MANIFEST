@@ -10,13 +10,16 @@ etc/logparser.conf
 lib/SNMP/LogParser.pm
 lib/SNMP/LogParserDriver.pm
 lib/SNMP/LogParserDriver/ExampleDriver.pm
-lib/SNMP/LogParserDriver/ProxyLog.pm
 t/00-load.t
 t/boilerplate.t
 t/concurrentProcess.t
 t/logparser.t
 t/pod-coverage.t
 t/pod.t
+t/var/example.log
+t/etc/logparser.conf
+t/etc/log4perl.conf
 log/logparser.log
 work/logparser.properties
+EXAMPLES/ProxyLog.pm
 SIGNATURE    Added here by Module::Build
