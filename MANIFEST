@@ -22,4 +22,4 @@ t/etc/log4perl.conf
 log/logparser.log
 work/logparser.properties
 EXAMPLES/ProxyLog.pm
-SIGNATURE    Added here by Module::Build
+META.json

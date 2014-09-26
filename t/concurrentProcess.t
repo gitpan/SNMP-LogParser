@@ -12,7 +12,7 @@ use File::Spec;
 # Make sure LOGPARSER_WAIT_TIME > FORK_WAIT_TIME
 use constant {
     PROC_NUMBER         => 4,
-    LOGPARSER_WAIT_TIME => 3,
+    LOGPARSER_WAIT_TIME => 5,
     FORK_WAIT_TIME      => 1,
     NO_WAIT_TIME        => 0,
     CLEAN               => 0,

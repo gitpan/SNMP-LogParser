@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# $Id: logparser 15290 2012-05-03 21:00:07Z rporres $
+# $Id: logparser 24743 2014-09-26 14:36:11Z nito $
 #
 # Generic parser script used to fetch data
 # from logs and generate a properties file
@@ -33,7 +33,7 @@ local our $logger;
 # Constants
 use constant {
     AUTHOR          => 'Nito@Qindel.ES',
-    VERSION         => '$Id: logparser 15290 2012-05-03 21:00:07Z rporres $ ',
+    VERSION         => '$Id: logparser 24743 2014-09-26 14:36:11Z nito $ ',
     LOG_TAG         => 'logparser',
     NUM_PROCESSES   => 1,
     STOREFILE       => '/var/lib/logparser/logparser.store',
@@ -261,10 +261,10 @@ sub storeProperties {
   my ($fh, $tempfilename) = File::Temp::tempfile( DIR => $dir );
   $properties->store($fh);
   close $fh
-    or cleanUpAndExit("Unable to close temp file for writing:$!");
+    or cleanupAndExit("Unable to close temp file for writing:$!");
 
   rename  $tempfilename, $file
-    or cleanUpAndExit("Unable to rename temp file from $tempfilename to $file: $!");
+    or cleanupAndExit("Unable to rename temp file from $tempfilename to $file: $!");
 }
 
 

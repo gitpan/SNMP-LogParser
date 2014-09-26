@@ -2,9 +2,17 @@
 abstract: 'An incremental logparser to be used with Net-SNMP'
 author:
   - 'Nito Martinez <nito@qindel.es>'
+build_requires:
+  FindBin: 0
+  IPC::Run3: 0
+  Test::More: 0
+  Test::Pod: 1.14
+  Test::Pod::Coverage: 1.04
+  Test::SharedFork: 0
 configure_requires:
-  Module::Build: 0.36
-generated_by: 'Module::Build version 0.3607'
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4203, CPAN::Meta::Converter version 2.112150'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -13,18 +21,21 @@ name: SNMP-LogParser
 provides:
   SNMP::LogParser:
     file: lib/SNMP/LogParser.pm
-    version: 1.15290
+    version: 1.24743
   SNMP::LogParserDriver:
     file: lib/SNMP/LogParserDriver.pm
+    version: 0
   SNMP::LogParserDriver::ExampleDriver:
     file: lib/SNMP/LogParserDriver/ExampleDriver.pm
+    version: 0
 requires:
   Config::Properties::Simple: 0.14
-  File::Path: 1.05
+  Data::Dumper: 0
+  Fcntl: 0
   File::Spec: 0
   File::Temp: 0
   File::stat: 0
-  IPC::Run3: 0
+  Getopt::Long: 0
   Log::Dispatch::FileRotate: 0
   Log::Log4perl: 0
   POSIX: 0
@@ -32,12 +43,9 @@ requires:
   Proc::ProcessTable: 0
   Statistics::Descriptive: 0
   Storable: 0
-  Test::More: 0
-  Test::Pod: 1.14
-  Test::Pod::Coverage: 1.04
-  Test::SharedFork: 0
+  constant: 0
   lib: 0
   parent: 0
 resources:
   license: http://dev.perl.org/licenses/
-version: 1.15290
+version: 1.24743

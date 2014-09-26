@@ -5,9 +5,8 @@ use 5.006;
 use warnings;
 use strict;
  
-
 # Checked version
-our $VERSION = sprintf "1.%04d", q$Revision: 15290 $ =~ /(\d+)/g;
+our $VERSION = sprintf "1.%04d", q$Revision: 24743 $ =~ /(\d+)/g;
 
 =head1 NAME
 
@@ -15,7 +14,7 @@ SNMP::LogParser - An incremental logparser to be used with Net-SNMP
 
 =head1 VERSION
 
-Version $Revision: 15290 $
+Version $Revision: 24743 $
 
 =head1 SYNOPSIS
 

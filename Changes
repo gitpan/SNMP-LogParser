@@ -1,6 +1,12 @@
-$Id: Changes 15291 2012-05-03 21:01:14Z rporres $
+$Id: Changes 24744 2014-09-26 14:38:45Z nito $
 
 Revision history for SNMP-LogParser
+
+1.24742 03/05/2012
+
+   [BUGS]
+
+   * Fixed bug #99152 and patch about s/cleanUpAndExit/cleanupAndExit/ reported via rt.cpan.org
 
 1.15290 03/05/2012
 
